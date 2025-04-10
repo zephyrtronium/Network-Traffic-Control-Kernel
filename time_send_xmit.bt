@@ -1,0 +1,41 @@
+#!/usr/bin/env bpftrace
+
+#include <linux/skbuff.h>
+
+
+tracepoint:syscalls:sys_enter_sendto
+/ comm == "sendeth" /
+{
+    $buff = (uint8*)args->buff;
+    $len = args->len;
+
+    $p = (uint8 *)($buff + 14);
+    // need to account for little endian
+    $key = ((uint16)$p[0] << 8) | (uint16)$p[1];
+
+    printf("action=sendto time=%ld key=%u\n", nsecs, $key);
+}
+
+tracepoint:net:net_dev_start_xmit
+/ comm == "sendeth" /
+{
+  $skb = (struct sk_buff *)(args->skbaddr);
+  $data = $skb->head + $skb->mac_header;
+
+  $p = (uint8 *)($data + 14);
+  $key = ((uint16)$p[0] << 8) | (uint16)$p[1];
+
+  printf("action=dev_start_xmit time=%ld key=%u\n", nsecs, $key);
+}
+
+tracepoint:net:net_dev_xmit
+/ comm == "sendeth" /
+{
+  $skb = (struct sk_buff *)(args->skbaddr);
+  $data = $skb->head + $skb->mac_header;
+
+  $p = (uint8 *)($data + 14);
+  $key = ((uint16)$p[0] << 8) | (uint16)$p[1];
+
+  printf("action=dev_xmit time=%ld key=%u\n", nsecs, $key);
+}
