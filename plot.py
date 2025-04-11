@@ -18,7 +18,7 @@ def load_xmit(file: Iterator[str]) -> list[list[int]]:
     """
     return [list(map(int, row.split(','))) for row in file]
 
-def plot_latency(starts: list[int], latencies: list[int], output: str = 'latency_plot.png') -> None:
+def plot_latency(starts: list[float], latencies: list[float], output: str = 'latency_plot.png') -> None:
     """
     Plots latency (y-axis) against packet ID (x-axis).
 
@@ -29,7 +29,7 @@ def plot_latency(starts: list[int], latencies: list[int], output: str = 'latency
     packet_ids = range(len(latencies))
     plt.plot(packet_ids, latencies, marker="o", linestyle="-", color="b", label="Latency")
     plt.xlabel("Packet Time (ns)")
-    plt.ylabel("Latency (ns)")
+    plt.ylabel("Latency (s)")
     plt.title("Latency vs Packet Time")
     plt.grid(True)
     plt.legend()
@@ -41,5 +41,6 @@ if __name__ == '__main__':
         inp = sys.argv[1]
     with open(inp, 'r') as f:
         rows = load_xmit(f)
-    cols = [[row[i] for row in rows] for i in range(len(rows[0]))]
+    cols = [[row[i] / 1e9 for row in rows] for i in range(len(rows[0]))]
+    cols[0] = [x - cols[0][0] for x in cols[0]]
     plot_latency(cols[0], cols[-1], output='latency_plot.png')
