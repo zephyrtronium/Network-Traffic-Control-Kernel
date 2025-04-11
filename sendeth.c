@@ -74,6 +74,8 @@ int main(int argc, char* argv[]) {
             close(sockfd);
             exit(EXIT_FAILURE);
         }
+
+        usleep(1000); // Sleep for 1 ms to add a bit of jitter.
     }
 
     printf("Dummy packets sent.\n");

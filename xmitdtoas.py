@@ -85,9 +85,11 @@ def packets(actions: List[str], lines: Iterator[Tuple[str, int, int]]) -> Iterat
         if all(x is not None for x in times[key]):
             yield times[key]
             del times[key]
-    # Now input is exhausted, so emit everything that's left.
-    for t in times.values():
-        yield [v or 0 for v in t]
+    # Now input is exhausted. Everything that's left is an incomplete
+    # packet. Discard it.
+    if times:
+        print(f"Warning: {len(times)} packets were not complete", file=sys.stderr)
+
 
 def dtoas(times: List[int]) -> List[int]:
     """Convert a list of times to a list of times since the first.
