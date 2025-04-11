@@ -45,6 +45,6 @@ kill $BPFPID
 wait -fn $BPFPID
 
 # Convert the trace to a CSV of time deltas.
-cat $NTCK_DIR/comm_sendeth.trace | python3 xmitdtoas.py > $NTCK_DIR/comm_sendeth.csv
+cat $NTCK_DIR/comm_sendeth.trace | python3 xmitdtoas.py | sort -nt, > $NTCK_DIR/comm_sendeth.csv
 # Plot the results.
 python3 plot.py $NTCK_DIR/comm_sendeth.csv
